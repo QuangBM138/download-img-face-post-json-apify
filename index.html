@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool Tải Ảnh Từ JSON</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen py-10 px-4 font-sans">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-md">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4 text-center">Tool Tải Hàng Loạt Ảnh Từ JSON</h1>
+        
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Dán đoạn JSON của bạn vào đây:</label>
+            <textarea id="jsonInput" rows="8" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder='[{"image": "url_anh_1", ...}, ...]精密'></textarea>
+        </div>
+
+        <div class="flex flex-wrap gap-3 mb-6">
+            <button id="btnProcess" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded-lg shadow transition duration-200 cursor-pointer">
+                Xử lý & Xem trước
+            </button>
+            <button id="btnDownloadAll" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-5 rounded-lg shadow transition duration-200 hidden cursor-pointer">
+                Tải Xuống File nén (.ZIP)
+            </button>
+        </div>
+
+        <div id="status" class="text-sm font-medium text-blue-600 mb-4 hidden"></div>
+
+        <div id="previewSection" class="hidden">
+            <h2 class="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">Danh sách ảnh phát hiện (${count}):</h2>
+            <div id="imageGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        const jsonInput = document.getElementById('jsonInput');
+        const btnProcess = document.getElementById('btnProcess');
+        const btnDownloadAll = document.getElementById('btnDownloadAll');
+        const status = document.getElementById('status');
+        const previewSection = document.getElementById('previewSection');
+        const imageGrid = document.getElementById('imageGrid');
+
+        let imageUrls = [];
+
+        // HÀM XỬ LÝ JSON VÀ HIỂN THỊ ẢNH
+        btnProcess.addEventListener('click', () => {
+            let rawData = jsonInput.value.trim();
+            
+            // Tự động sửa lỗi dấu phẩy thừa ở cuối JSON nếu có
+            if (rawData.endsWith(',]')) rawData = rawData.replace(',]', ']');
+            if (rawData.endsWith(',')) rawData = rawData.slice(0, -1);
+            if (!rawData.endsWith(']') && !rawData.includes(']')) rawData += ']';
+
+            try {
+                const data = JSON.parse(rawData);
+                imageUrls = data.map(item => item.image).filter(url => url);
+
+                if (imageUrls.length === 0) {
+                    alert('Không tìm thấy link ảnh nào trong đoạn JSON.');
+                    return;
+                }
+
+                // Hiển thị giao diện xem trước
+                imageGrid.innerHTML = '';
+                imageUrls.forEach((url, index) => {
+                    const card = document.createElement('div');
+                    card.className = "bg-gray-50 p-2 border border-gray-200 rounded-lg flex flex-col justify-between items-center";
+                    card.innerHTML = `
+                        <img src="${url}" class="w-full h-32 object-cover rounded mb-2 text-xs text-gray-400" alt="Ảnh lỗi/Chặn CORS">
+                        <a href="${url}" target="_blank" class="text-xs text-blue-500 hover:underline truncate w-full text-center">Xem link gốc</a>
+                    `;
+                    imageGrid.appendChild(card);
+                });
+
+                previewSection.classList.remove('hidden');
+                btnDownloadAll.classList.remove('hidden');
+                status.classList.add('hidden');
+
+            } catch (error) {
+                alert('Định dạng JSON không hợp lệ! Vui lòng kiểm tra lại cấu trúc.\nChi tiết: ' + error.message);
+            }
+        });
+
+        // HÀM TẢI ẢNH VỀ VÀ NÉN THÀNH ZIP
+        btnDownloadAll.addEventListener('click', async () => {
+            if (imageUrls.length === 0) return;
+
+            btnDownloadAll.disabled = true;
+            btnDownloadAll.innerText = "Đang xử lý...";
+            status.classList.remove('hidden');
+            status.innerText = "Bắt đầu tải và nén ảnh...";
+
+            const zip = new JSZip();
+
+            for (let i = 0; i < imageUrls.length; i++) {
+                const url = imageUrls[i];
+                status.innerText = `Đang tải ảnh ${i + 1}/${imageUrls.length}...`;
+
+                try {
+                    // Fetch ảnh về dưới dạng Blob
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error("Không thể fetch ảnh");
+                    const blob = await response.blob();
+                    
+                    // Thêm vào file zip (Đặt tên ảnh theo số thứ tự: hinh_1.jpg, hinh_2.jpg...)
+                    zip.file(`hinh_${i + 1}.jpg`, blob);
+                } catch (err) {
+                    console.error("Lỗi khi tải ảnh: " + url, err);
+                    status.innerText = `Lỗi khi tải ảnh số ${i + 1}. Đang tiếp tục ảnh khác...`;
+                }
+            }
+
+            status.innerText = "Đang khởi tạo file nén...";
+            
+            // Xuất ra file ZIP và kích hoạt download tự động
+            zip.generateAsync({ type: "blob" }).then(function (content) {
+                saveAs(content, "tat_ca_hinh_anh.zip");
+                status.innerText = "Tải xuống hoàn tất!";
+                btnDownloadAll.disabled = false;
+                btnDownloadAll.innerText = "Tải Xuống File nén (.ZIP)";
+            }).catch(err => {
+                alert("Có lỗi xảy ra khi nén file: " + err.message);
+                btnDownloadAll.disabled = false;
+                btnDownloadAll.innerText = "Tải Xuống File nén (.ZIP)";
+            });
+        });
+    </script>
+</body>
+</html>
