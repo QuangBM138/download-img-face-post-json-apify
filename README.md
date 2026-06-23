@@ -1,6 +1,6 @@
 # Bulk Image Downloader from JSON
 
-A simple and efficient web tool to download bulk images from Facebook posts using Apify's Facebook Photos Scraper. This tool converts JSON data from Apify into downloadable image files packaged in a ZIP archive.
+A simple and efficient web tool to download bulk images from Facebook posts using Apify's Facebook Photos Scraper. This tool converts JSON data from Apify into downloadable image files packaged in [...]
 
 ## 🌐 Live Demo
 Visit the web application here: **[https://download-img-face-post-json-apify.vercel.app/](https://download-img-face-post-json-apify.vercel.app/)**
@@ -18,7 +18,7 @@ Visit the web application here: **[https://download-img-face-post-json-apify.ver
 
 This project is designed to streamline the process of extracting and downloading multiple images from Facebook posts. It combines:
 1. **Apify** - A powerful web scraping platform
-2. **Facebook Photos Scraper** - An Apify actor that extracts photo data from Facebook posts
+2. **Facebook Photos Scraper** - An Apify actor that extracts photo data from Facebook posts ([https://apify.com/apify/facebook-photos-scraper](https://apify.com/apify/facebook-photos-scraper))
 3. **This Web Tool** - Converts JSON output into downloadable images
 
 ## ✨ Features
@@ -34,7 +34,7 @@ This project is designed to streamline the process of extracting and downloading
 
 Before using this tool, you'll need:
 1. An **Apify account** (free or paid) - [Sign up here](https://apify.com)
-2. Access to **Facebook Photos Scraper** from Apify Store
+2. Access to **Facebook Photos Scraper** from Apify Store - see: [https://apify.com/apify/facebook-photos-scraper](https://apify.com/apify/facebook-photos-scraper)
 3. A **Facebook post URL** that you want to extract images from
 4. Basic understanding of JSON format
 
@@ -66,7 +66,7 @@ Facebook Post (73 images)
 ### Step 2: Find Facebook Photos Scraper
 
 1. Navigate to **Apify Store**
-2. Search for **`facebook-photos-scraper`**
+2. Search for **`facebook-photos-scraper`** OR open directly: [https://apify.com/apify/facebook-photos-scraper](https://apify.com/apify/facebook-photos-scraper)
 3. Click on the actor to open it
 
 ### Step 3: Configure the Scraper
@@ -109,7 +109,7 @@ Facebook Post (73 images)
 
 ### Step 7: Use This Web Tool
 
-1. Visit **[https://download-img-face-post-json-apify.vercel.app/](https://download-img-face-post-json-apify.vercel.app/)**
+1. Visit **[https://download-img-face-post-json-apify.vercel.app/](https://download-img-face-post-json-apify.vercel.app/)"
 2. **Paste the JSON** into the text area
 3. Click **"Parse & Preview"** button
 4. The tool will:
@@ -232,3 +232,5 @@ If you encounter any issues or have questions:
 **Happy downloading! 🎉**
 
 For more information about Apify, visit: [https://apify.com](https://apify.com)
+
+Direct link to the Apify actor used by this project: https://apify.com/apify/facebook-photos-scraper
