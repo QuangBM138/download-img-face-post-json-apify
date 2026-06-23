@@ -66,7 +66,7 @@ Facebook Post (73 images)
 ### Step 2: Find Facebook Photos Scraper
 
 1. Navigate to **Apify Store**
-2. Search for **`facebook-photos-scraper`**(https://console.apify.com/actors/KoJrdxJCTtpon81KY/information/latest/readme)
+2. Search for **`facebook-photos-scraper`**(https://apify.com/apify/facebook-posts-scraper)
 3. Click on the actor to open it
 
 ### Step 3: Configure the Scraper
